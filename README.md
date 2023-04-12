@@ -59,3 +59,4 @@ Project is hosted <a href="https://live-auctions.netlify.app/"><strong>here</str
 - If you do not want to register, press the skip button during login. This will log you in as a test user (test@test.com).
 # auction-client
 # auction-clients
+# auction-new
