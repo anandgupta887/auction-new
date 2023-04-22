@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { Navigate } from 'react-router-dom';
-import openSocket from 'socket.io-client';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { Navigate } from "react-router-dom";
+import openSocket from "socket.io-client";
 // MUI
-import { Button, Box, ButtonGroup } from '@mui/material';
+import { Button, Box, ButtonGroup, Grid } from "@mui/material";
 // Styling
-import './css/board.css';
+import "./css/board.css";
 import {
   adAreaStyle,
   boardCardStyle,
   boardStyle,
   paginationStyle,
-} from './css/boardStyle';
+} from "./css/boardStyle";
 // Actions
-import { loadAds, adPostedByOther, updateAdInList } from '../actions/ad';
-import { setAlert, clearAlerts } from '../actions/alert';
+import { loadAds, adPostedByOther, updateAdInList } from "../actions/ad";
+import { setAlert, clearAlerts } from "../actions/alert";
 // Components
-import Spinner from './Spinner';
-import Card from './Card';
+import Spinner from "./Spinner";
+import Card from "./Card";
 
 const Board = (props) => {
   const [pageNumber, setPageNumber] = useState(1);
@@ -30,7 +30,7 @@ const Board = (props) => {
       props.loadAds();
       const socket = openSocket(process.env.REACT_APP_API_BASE_URL);
       // when new ad is added
-      socket.on('addAd', (data) => {
+      socket.on("addAd", (data) => {
         console.log(data);
         if (
           props.user &&
@@ -38,20 +38,20 @@ const Board = (props) => {
           data.ad.owner.toString() !== props.user._id.toString()
         ) {
           props.clearAlerts();
-          props.setAlert('New ads available', 'info', 60000);
+          props.setAlert("New ads available", "info", 60000);
         }
       });
       // when auction starts/ends
-      socket.on('auctionStarted', (res) => {
+      socket.on("auctionStarted", (res) => {
         props.updateAdInList(res.data);
       });
-      socket.on('auctionEnded', (res) => {
+      socket.on("auctionEnded", (res) => {
         props.updateAdInList(res.data);
       });
 
       // disconnect socket when page left
       return () => {
-        socket.emit('leaveHome');
+        socket.emit("leaveHome");
         socket.off();
         props.clearAlerts();
       };
@@ -60,7 +60,7 @@ const Board = (props) => {
 
   // Check if user is logged
   if (!props.isAuth) {
-    return <Navigate to='/login' />;
+    return <Navigate to="/login" />;
   }
 
   // Pagination
@@ -80,44 +80,53 @@ const Board = (props) => {
   return props.loading ? (
     <Spinner />
   ) : (
-    <Box sx={boardStyle}>
-      <Box sx={adAreaStyle}>
-        {props.ads.slice(firstAdIndex, lastAdIndex).map((ad) => {
-          return ad.auctionEnded ? null : (
-            <div className='product__container' key={ad._id}>
-              <Card ad={ad} key={ad._id} dashCard={false} cardStyle={boardCardStyle} />
-            </div>
-          );
-        })}
-      </Box>
-      <Box sx={paginationStyle}>
-        <ButtonGroup variant='outlined' size='small'>
-          <Button
-            disabled={pageNumber === 1}
-            onClick={(e) => clickPageNumberButton(pageNumber - 1)}
-          >
-            Prev
-          </Button>
-          {pageNumbers.map((num) => {
-            return (
-              <Button
-                key={num}
-                disabled={pageNumber === num}
-                onClick={(e) => clickPageNumberButton(num)}
-              >
-                {num}
-              </Button>
+    <Grid container spacing={2} sx={{}}>
+      <Grid item xs={12}>
+        <Grid container spacing={2}>
+          {props.ads.slice(firstAdIndex, lastAdIndex).map((ad) => {
+            return ad.auctionEnded ? null : (
+              <Grid item xs={12} sm={6} md={4}>
+                <Card
+                  ad={ad}
+                  key={ad._id}
+                  dashCard={false}
+                  cardStyle={boardCardStyle}
+                />
+              </Grid>
             );
           })}
-          <Button
-            disabled={pageNumber === pageNumbers[pageNumbers.length - 1]}
-            onClick={(e) => clickPageNumberButton(pageNumber + 1)}
-          >
-            Next
-          </Button>
-        </ButtonGroup>
-      </Box>
-    </Box>
+        </Grid>
+      </Grid>
+      <Grid item xs={12} sx={{}}>
+        <Box sx={{textAlign:'center'}}>
+          <ButtonGroup variant="outlined" size="small">
+            <Button
+              disabled={pageNumber === 1}
+              onClick={(e) => clickPageNumberButton(pageNumber - 1)}
+            >
+              Prev
+            </Button>
+            {pageNumbers.map((num) => {
+              return (
+                <Button
+                  key={num}
+                  disabled={pageNumber === num}
+                  onClick={(e) => clickPageNumberButton(num)}
+                >
+                  {num}
+                </Button>
+              );
+            })}
+            <Button
+              disabled={pageNumber === pageNumbers[pageNumbers.length - 1]}
+              onClick={(e) => clickPageNumberButton(pageNumber + 1)}
+            >
+              Next
+            </Button>
+          </ButtonGroup>
+        </Box>
+      </Grid>
+    </Grid>
   );
 };
 

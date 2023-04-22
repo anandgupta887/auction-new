@@ -27,7 +27,7 @@
   margin: 0 20px;
 }
 .nav__group2 > * {
-  margin: 0 20px;
+  /* margin: 0 20px; */
 }
 .nav__buttons {
   display: flex;
